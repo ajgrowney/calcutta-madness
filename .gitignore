@@ -8,3 +8,4 @@ artifacts/
 package-lock.json
 .python-version
 *.tfstate
+terraform/vars.tf
