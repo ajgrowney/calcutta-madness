@@ -1,0 +1,32 @@
+openapi: 3.0.1
+info:
+  title: WebSocket API
+  description: API for WebSocket connections
+  version: 1.0.0
+paths:
+  /@connections/{connectionId}:
+    delete:
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/calcutta_websockets/invocations
+        httpMethod: POST
+        type: aws_proxy
+      responses:
+        '200':
+          description: OK
+  /:
+    post:
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/calcutta_websockets/invocations
+        httpMethod: POST
+        type: aws_proxy
+      responses:
+        '200':
+          description: OK
+components:
+  securitySchemes:
+    sigv4:
+      type: apiKey
+      name: Authorization
+      in: header
+security:
+  - sigv4: []

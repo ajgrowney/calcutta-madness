@@ -1,0 +1,10 @@
+node_modules/
+.cache/
+public
+.env
+artifacts/
+.terraform/
+.terraform.lock.hcl
+package-lock.json
+.python-version
+*.tfstate

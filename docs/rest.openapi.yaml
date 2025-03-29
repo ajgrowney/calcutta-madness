@@ -1,0 +1,1004 @@
+openapi: 3.0.0
+info:
+  title: Calcutta Madness API
+  description: API for managing Calcutta Madness auctions
+  version: 1.0.0
+servers:
+  - url: https://api.calcutta-madness.com/prod
+paths:
+  /auctions:
+    post:
+      summary: Create a new auction
+      operationId: createAuction
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:226285930562:function:calcutta_rest_create_auction/invocations
+        httpMethod: POST
+        type: aws_proxy
+        passthroughBehavior: when_no_match
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                auctionId:
+                  type: string
+                name:
+                  type: string
+                type:
+                  type: string
+              required:
+                - auctionId
+                - name
+                - type
+      responses:
+        '200':
+          description: Auction created successfully
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  auctionId:
+                    type: string
+                  name:
+                    type: string
+                  auctionState:
+                    type: string
+        '400':
+          description: Bad request
+          $ref: '#/components/responses/errorResponse'
+        '500':
+          description: Internal server error
+          $ref: '#/components/responses/errorResponse'
+      security:
+      - CognitoAuth: []
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      responses:
+        '200':
+          description: CORS enabled
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+              description: Origin allowed
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+              description: Methods allowed
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+              description: Headers allowed
+          content: {}
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: '{}'
+  /user-auctions:
+    get:
+      summary: Get the list of auctions the user is signed up for
+      operationId: getUserAuctions
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:226285930562:function:calcutta_rest_get_user_auctions/invocations
+        httpMethod: POST
+        type: aws_proxy
+        passthroughBehavior: when_no_match
+      responses:
+        '200':
+          description: List of user auctions
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    auctionId:
+                      type: string
+                    name:
+                      type: string
+                    auctionState:
+                      type: string
+        '400':
+          description: Bad request
+          $ref: '#/components/responses/errorResponse'
+        '500':
+          description: Internal server error
+          $ref: '#/components/responses/errorResponse'
+      security:
+      - CognitoAuth: []
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      responses:
+        '200':
+          $ref: '#/components/responses/corsResponse'
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: '{}'
+  /auctions/{auctionId}:
+    get:
+      summary: Get details of a specific auction
+      operationId: getAuctionDetails
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:226285930562:function:calcutta_rest_get_auction_details/invocations
+        httpMethod: POST
+        type: aws_proxy
+        passthroughBehavior: when_no_match
+      parameters:
+        - name: auctionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Auction details
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  auctionId:
+                    type: string
+                  name:
+                    type: string
+                  auctionState:
+                    type: string
+        '400':
+          description: Bad request
+          $ref: '#/components/responses/errorResponse'
+        '500':
+          description: Internal server error
+          $ref: '#/components/responses/errorResponse'
+      security:
+      - CognitoAuth: []
+    put:
+      summary: Update settings of a specific auction
+      operationId: updateAuctionSettings
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:226285930562:function:calcutta_rest_update_auction_settings/invocations
+        httpMethod: POST
+        type: aws_proxy
+        passthroughBehavior: when_no_match
+      parameters:
+        - name: auctionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+      responses:
+        '200':
+          description: Auction settings updated successfully
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  auctionId:
+                    type: string
+                  updated:
+                    type: object
+                    additionalProperties:
+                      type: string
+        '400':
+          description: Bad request
+          $ref: '#/components/responses/errorResponse'
+        '500':
+          description: Internal server error
+          $ref: '#/components/responses/errorResponse'
+      security:
+      - CognitoAuth: []
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      parameters:
+        - name: auctionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: CORS enabled
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+              description: Origin allowed
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+              description: Methods allowed
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+              description: Headers allowed
+          content: {}
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,PUT,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: '{}'
+  /auctions/{auctionId}/participants:
+    parameters:
+      - $ref: '#/components/parameters/AuctionIdPath'
+    post:
+      description: Add a participants to an auction
+      operationId: addAuctionUsers
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:226285930562:function:calcutta_rest_add_auction_users/invocations
+        httpMethod: POST
+        type: aws_proxy
+        passthroughBehavior: when_no_match
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userIds:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - userIds
+      responses:
+        '204':
+          description: 'Success'
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+        '400':
+          description: Bad request
+          $ref: '#/components/responses/errorResponse'
+        '500':
+          description: Internal server error
+          $ref: '#/components/responses/errorResponse'
+      security:
+      - CognitoAuth: []
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      parameters:
+        - $ref: '#/components/parameters/AuctionIdPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/corsResponse'
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: '{}'
+
+
+  /auctions/{auctionId}/bid:
+    post:
+      summary: Place a bid on a team
+      operationId: placeBid
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:226285930562:function:calcutta_rest_place_bid/invocations
+        httpMethod: POST
+        type: aws_proxy
+        passthroughBehavior: when_no_match
+      parameters:
+        - name: auctionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CurrentItemBlock'
+      responses:
+        '200':
+          description: Bid placed successfully
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  auctionId:
+                    type: string
+                  teamId:
+                    type: string
+                  highestBid:
+                    type: number
+                  highestBidder:
+                    type: string
+        '400':
+          description: Bad request
+          $ref: '#/components/responses/errorResponse'
+        '500':
+          description: Internal server error
+          $ref: '#/components/responses/errorResponse'
+      security:
+      - CognitoAuth: []
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      parameters:
+        - name: auctionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: CORS enabled
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+              description: Origin allowed
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+              description: Methods allowed
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+              description: Headers allowed
+          content: {}
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: '{}'
+  /auctions/{auctionId}/start:
+    post:
+      summary: Start the auction
+      operationId: startAuction
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:226285930562:function:calcutta_rest_start_auction/invocations
+        httpMethod: POST
+        type: aws_proxy
+        passthroughBehavior: when_no_match
+      parameters:
+        - name: auctionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Auction started successfully
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  auctionId:
+                    type: string
+                  auctionState:
+                    type: string
+        '400':
+          description: Bad request
+          $ref: '#/components/responses/errorResponse'
+        '500':
+          description: Internal server error
+          $ref: '#/components/responses/errorResponse'
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      parameters:
+        - name: auctionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: CORS enabled
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+              description: Origin allowed
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+              description: Methods allowed
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+              description: Headers allowed
+          content: {}
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: '{}'
+  /auctions/{auctionId}/next:
+    post:
+      summary: Move to the next item in the auction
+      operationId: auctionNext
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:226285930562:function:calcutta_rest_auction_next/invocations
+        httpMethod: POST
+        type: aws_proxy
+        passthroughBehavior: when_no_match
+      parameters:
+        - name: auctionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Bidding closed successfully
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  auctionId:
+                    type: string
+                  auctionState:
+                    type: string
+        '400':
+          description: Bad request
+          $ref: '#/components/responses/errorResponse'
+        '500':
+          description: Internal server error
+          $ref: '#/components/responses/errorResponse'
+      security:
+      - CognitoAuth: []
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      parameters:
+        - name: auctionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/corsResponse'
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: '{}'
+  /auctions/{auctionId}/items:
+    parameters:
+      - $ref: '#/components/parameters/AuctionIdPath'
+    get:
+      summary: Get the list of items in an auction
+      operationId: getAuctionItems
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:226285930562:function:calcutta_rest_get_auction_items/invocations
+        httpMethod: POST
+        type: aws_proxy
+        passthroughBehavior: when_no_match
+      responses:
+        '200':
+          $ref: '#/components/responses/auctionItemsResponse'
+        '400':
+          description: Bad request
+          $ref: '#/components/responses/errorResponse'
+        '500':
+          description: Internal server error
+          $ref: '#/components/responses/errorResponse'
+      security:
+      - CognitoAuth: []
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      parameters:
+        - $ref: '#/components/parameters/AuctionIdPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/corsResponse'
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: '{}'
+  /auctions/{auctionId}/add-time:
+    parameters:
+      - $ref: '#/components/parameters/AuctionIdPath'
+    post: 
+      summary: Add time to the current item on the auction block
+      operationId: addTime
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:226285930562:function:calcutta_rest_add_auction_time/invocations
+        httpMethod: POST
+        type: aws_proxy
+        passthroughBehavior: when_no_match
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expiresAt:
+                  type: string
+              required:
+                - expiresAt
+      responses:
+        '204':
+          description: Time added successfully
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+        '400':
+          description: Bad request
+          $ref: '#/components/responses/errorResponse'
+        '500':
+          description: Internal server error
+          $ref: '#/components/responses/errorResponse'
+      security:
+      - CognitoAuth: []
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      operationId: addTimeOptions
+      responses:
+        '200':
+          $ref: '#/components/responses/corsResponse'
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: '{}'
+  /auctions/{auctionId}/history:
+    parameters:
+      - $ref: '#/components/parameters/AuctionIdPath'
+    get:
+      summary: Get the bidding history for an auction
+      operationId: getAuctionHistory
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:226285930562:function:calcutta_rest_get_auction_history/invocations
+        httpMethod: POST
+        type: aws_proxy
+        passthroughBehavior: when_no_match
+      responses:
+        '200':
+          description: Auction history
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionItemHistory'
+        '400':
+          description: Bad request
+          $ref: '#/components/responses/errorResponse'
+        '500':
+          description: Internal server error
+          $ref: '#/components/responses/errorResponse'
+      security:
+      - CognitoAuth: []
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      responses:
+        '200':
+          $ref: '#/components/responses/corsResponse'
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: '{}'
+components:
+  schemas:
+    CreateAuction:
+      type: object
+      properties:
+        auctionId:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+      required:
+        - auctionId
+        - name
+        - type
+      example:
+        auctionId: "msg-2025"
+        name: "2025 MSG Auction"
+        type: "march-2025"
+    AuctionInfo:
+      type: object
+      properties:
+        auctionId:
+          type: string
+        name:
+          type: string
+        auctionState:
+          type: string
+        currentItem:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            bidAmount:
+              type: number
+            bidder:
+              type: string
+            closes:
+              type: string
+      required:
+        - auctionId
+        - name
+        - auctionState
+
+      example:
+        auctionId: "msg-2025"
+        name: "2025 MSG Auction"
+        auctionState: "LIVE"
+        currentItem:
+          id: 't10'
+          name: 'UC San Diego'
+          bidAmount: 100
+          bidder: 'user-123'
+          closes: '2025-03-15T12:00:00Z'
+    AuctionItemHistory:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+          bidAmount:
+            type: number
+          bidder:
+            type: string
+      example:
+        - id: 't10'
+          name: 'UC San Diego'
+          bidAmount: 100
+          bidder: 'user-123'
+        - id: 't11'
+          name: 'Duke'
+          bidAmount: 200
+          bidder: 'user-124'
+    AuctionItems:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+        groups:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+    ErrorResponse:
+      type: object
+      properties:
+        errorMessage:
+          type: string
+          description: Detailed error message to help with debugging
+        requestId:
+          type: string
+          description: Unique identifier for the request
+        stackTrace:
+          type: string
+          description: Stack trace of the error
+      required:
+        - errorMessage
+      example:
+        errorMessage: "An error occurred processing your request: Resource not found"
+    CurrentItemBlock:
+      type: object
+      properties:
+        id:
+          type: string
+        price:
+          type: number
+        bidder:
+          type: string
+        expiresAt:
+          type: string
+  responses:
+    corsResponse:
+      description: CORS enabled
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/AccessControlAllowOrigin'
+        Access-Control-Allow-Methods:
+          $ref: '#/components/headers/AccessControlAllowMethods'
+        Access-Control-Allow-Headers:
+          $ref: '#/components/headers/AccessControlAllowHeaders'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              requestId:
+                type: string
+    errorResponse:
+      description: Error response
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    auctionItemsResponse:
+      description: List of auction items
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/AccessControlAllowOrigin'
+        Access-Control-Allow-Methods:
+          $ref: '#/components/headers/AccessControlAllowMethods'
+        Access-Control-Allow-Headers:
+          $ref: '#/components/headers/AccessControlAllowHeaders'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuctionItems'
+  securitySchemes:
+    CognitoAuth:
+      type: apiKey
+      name: Authorization
+      in: header
+      x-amazon-apigateway-authtype: cognito_user_pools
+      x-amazon-apigateway-authorizer:
+        type: cognito_user_pools
+        providerARNs:
+          - arn:aws:cognito-idp:us-east-1:226285930562:userpool/us-east-1_IWrmOYsL5
+  headers:
+    AccessControlAllowOrigin:
+      description: Allowed origin for CORS
+      schema:
+        type: string
+        example: '*'
+    AccessControlAllowMethods:
+      description: Allowed HTTP methods for CORS
+      schema:
+        type: string
+        example: 'GET, POST, PUT, DELETE'
+    AccessControlAllowHeaders:
+      description: Allowed headers for CORS
+      schema:
+        type: string
+        example: 'Content-Type, Authorization'
+  parameters:
+    AuctionIdPath:
+      in: path
+      name: auctionId
+      required: true
+      schema:
+        type: string
+  x-amazon-apigateway-gateway-responses:
+    DEFAULT_4XX:
+      responseTemplates:
+        application/json: |
+          {
+            "errorMessage": "$context.error.message",
+            "requestId": "$context.requestId"
+          }
+      responseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+        gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS,PUT,DELETE'"
+    DEFAULT_5XX:
+      responseTemplates:
+        application/json: |
+          {
+            "errorMessage": "$context.error.messageString",
+            "requestId": "$context.requestId",
+            "stackTrace": "$input.path('$.errorMessage')"
+          }
+      responseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+        gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS,PUT,DELETE'"

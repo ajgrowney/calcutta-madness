@@ -1,0 +1,28 @@
+{
+  "name": "calcutta-madness",
+  "version": "1.0.0",
+  "private": true,
+  "description": "calcutta-madness",
+  "author": "Andrew Growney",
+  "keywords": [
+    "gatsby"
+  ],
+  "scripts": {
+    "develop": "gatsby develop",
+    "start": "gatsby develop --host 0.0.0.0",
+    "build": "gatsby build",
+    "serve": "gatsby serve",
+    "clean": "gatsby clean"
+  },
+  "dependencies": {
+    "amazon-cognito-identity-js": "^6.3.12",
+    "bootstrap": "^5.3.3",
+    "gatsby": "^5.14.1",
+    "gatsby-plugin-google-gtag": "^5.14.0",
+    "oidc-client-ts": "^3.2.0",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.10.9",
+    "react-dom": "^18.2.0",
+    "react-oidc-context": "^3.2.0"
+  }
+}
